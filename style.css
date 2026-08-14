@@ -306,16 +306,17 @@ body {
 
   .navbar-nav > ul {
     flex-direction: column;
-    align-items: stretch;
+    align-items: stretch !important;
     gap: 0;
     padding: 10px 6vw 20px;
   }
   .navbar-nav > ul > li {
-    display: block;
+    display: block !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   }
 
   .navbar-nav > ul > li > a {
+    display: block;
     padding: 16px 4px;
     width: 100%;
     border-radius: 0;
@@ -337,7 +338,9 @@ body {
     box-shadow: inset 0 0 0 2px var(--accent);
   }
 
-  .has-dropdown > a {
+  .navbar-nav > ul > li.has-dropdown > a {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
   }
   .has-dropdown > a::after {
