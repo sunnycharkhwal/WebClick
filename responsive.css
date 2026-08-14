@@ -1,0 +1,638 @@
+/* =====================================================================
+   Responsive / adaptive rules for SanSo Networks
+   All @media blocks (breakpoints + prefers-reduced-motion) live here,
+   split out of style.css to keep base styles and responsive overrides
+   separate. Load this file AFTER style.css.
+   ===================================================================== */
+
+/* ---------- slim navbar on narrower desktop widths so all links + CTA fit ---------- */
+@media (max-width: 1199.98px) and (min-width: 992px) {
+  .navbar-inner {
+    gap: 18px;
+    padding: 0 3.5vw;
+  }
+  .navbar-nav > ul {
+    gap: 4px;
+  }
+  .navbar-nav > ul > li > a {
+    padding: 10px 12px;
+    font-size: 0.86rem;
+  }
+  .btn-cta.navbar-cta {
+    padding: 10px 18px;
+    padding-right: calc(18px + 16px);
+    font-size: 0.72rem;
+  }
+  .btn-cta.navbar-cta::after {
+    right: 18px;
+  }
+}
+
+/* ---------- mobile nav ---------- */
+
+@media (max-width: 991.98px) {
+  .contact-info-list span {
+    font-size: 12px !important;
+  }
+  .contact-info-list {
+    margin-bottom: 10px !important;
+  }
+  .navbar-inner {
+    height: 70px;
+  }
+  .navbar-brand img {
+    height: 38px;
+  }
+  .btn-cta.navbar-cta {
+    display: none;
+  }
+  .navbar-toggle {
+    display: flex;
+  }
+
+  .navbar-nav {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    max-height: calc(100vh - 70px);
+    overflow-y: auto;
+    background: rgba(6, 9, 22, 0.97);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    transform: translateY(-12px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease,
+      visibility 0s linear 0.3s;
+  }
+  .navbar-nav.is-open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease,
+      visibility 0s linear 0s;
+  }
+
+  .navbar-nav > ul {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 0;
+    padding: 10px 6vw 20px;
+  }
+  .navbar-nav > ul > li {
+    display: block !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .navbar-nav > ul > li > a {
+    display: block;
+    padding: 16px 4px;
+    width: 100%;
+    border-radius: 0;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+  }
+  .navbar-nav > ul > li > a::before {
+    display: none;
+  }
+  .navbar-nav > ul > li > a:hover,
+  .navbar-nav > ul > li > a:focus-visible {
+    color: #fff;
+    transform: none;
+  }
+  .navbar-nav > ul > li > a:active {
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .navbar-nav > ul > li > a:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+
+  .navbar-nav > ul > li.has-dropdown > a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .has-dropdown > a::after {
+    margin-left: 10px;
+  }
+
+  .nav-dropdown {
+    position: static;
+    display: none;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    background: rgba(255, 255, 255, 0.04);
+    margin: 0 0 10px;
+    transition: none;
+  }
+  .has-dropdown.is-open .nav-dropdown {
+    display: block;
+  }
+  .has-dropdown.is-open > a::after {
+    transform: rotate(-135deg);
+  }
+}
+
+/* ---------- large screens: a little more breathing room ---------- */
+@media (min-width: 1400px) {
+  .hero-caption-inner {
+    max-width: 720px;
+  }
+  .lead-text {
+    max-width: 560px;
+  }
+}
+
+/* ---------- tablets ---------- */
+@media (max-width: 991.98px) {
+  .hero-slider .slide {
+    height: 78vh;
+    min-height: 500px;
+    max-height: 680px;
+  }
+  .hero-caption-inner {
+    max-width: 78%;
+  }
+  .caption-shadow {
+    top: -20px;
+    left: -24px;
+    right: -24px;
+    bottom: -20px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .hero-slider .slide {
+    height: 92vh;
+    min-height: 520px;
+    max-height: 640px;
+  }
+  .hero-caption-inner {
+    max-width: 100%;
+    left: 7vw;
+    right: 7vw;
+    top: auto;
+    /* the dots pill below is a fixed height pinned 16px from the bottom, so a
+       vw-based offset alone is too small on narrow phones (12vw of 320px is
+       38px -- the pill's top edge sits at ~41px). Floor it so the caption
+       always clears the controls with comfortable margin on every phone. */
+    bottom: max(12vw, 64px);
+    transform: none;
+  }
+  .lead-text {
+    max-width: 100%;
+    margin-bottom: 24px;
+  }
+  .slide-scrim {
+    background: linear-gradient(
+      180deg,
+      rgba(9, 12, 28, 0.25) 0%,
+      rgba(9, 12, 28, 0.9) 55%,
+      rgba(9, 12, 28, 0.95) 100%
+    );
+  }
+  .slider-controls .slick-prev,
+  .slider-controls .slick-next {
+    display: none !important;
+  }
+  .slider-controls {
+    left: 7vw;
+    bottom: 16px;
+  }
+  .caption-shadow {
+    top: -18px;
+    left: -18px;
+    right: -18px;
+    bottom: -18px;
+  }
+}
+
+/* ---------- small phones ---------- */
+@media (max-width: 479.98px) {
+  .eyebrow-icon {
+    width: 24px;
+    height: 24px;
+  }
+  .eyebrow span {
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+  }
+  .slide-caption h1 {
+    font-size: 1.5rem;
+  }
+  .lead-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .btn-cta,
+  .btn-outline-cta {
+    padding: 12px 22px;
+    padding-right: calc(22px + 18px);
+    font-size: 0.78rem;
+  }
+  .hero-buttons {
+    gap: 12px;
+  }
+  .caption-shadow {
+    top: -14px;
+    left: -14px;
+    right: -14px;
+    bottom: -14px;
+  }
+  .slider-controls {
+    padding: 6px;
+    gap: 10px;
+  }
+  .slider-controls .slick-dots li button {
+    width: 8px;
+    height: 8px;
+  }
+  .slider-controls .slick-dots li button:before {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+@media (max-height: 400px) {
+  .lead-text {
+    display: none;
+  }
+}
+
+/* ---------- short / landscape viewports (e.g. phone rotated) ---------- */
+@media (max-height: 520px) {
+  .hero-slider .slide {
+    height: auto;
+    min-height: 100vh;
+    max-height: none;
+  }
+  .hero-caption-inner {
+    position: relative;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    transform: none;
+  }
+  /* bottom padding reserves the slider-controls zone (pinned 14px up) so the
+     flex-centered caption can never slide down into it on short screens */
+  .slide-caption {
+    position: absolute;
+    inset: 0;
+    padding: 52px 6vw 112px;
+    display: flex;
+    align-items: center;
+  }
+  .slider-controls {
+    bottom: 14px;
+  }
+}
+
+/* ---------- partners: tablets / phones ---------- */
+@media (max-width: 991.98px) {
+  .partners {
+    padding: 48px 6vw 56px;
+  }
+  .partners-header {
+    margin-bottom: 32px;
+  }
+}
+
+/* ---------- partners: accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .partners-track {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+  }
+  .partners-track .partners-group:last-child {
+    display: none;
+  }
+  .partner-item {
+    transition: none;
+  }
+  .partner-item:hover {
+    transform: none;
+  }
+}
+
+/* ---------- about: tablets / phones ---------- */
+@media (max-width: 991.98px) {
+  .about {
+    padding: 90px 6vw 100px;
+  }
+  .about-header {
+    margin-bottom: 56px;
+  }
+  .about-grid {
+    --bs-gutter-x: 64px;
+    --bs-gutter-y: 64px;
+  }
+  .about-media {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .about-heading,
+  .about-body > p {
+    text-align: center;
+  }
+  .cisco-badge {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .about-points {
+    max-width: 430px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .about-cta {
+    justify-content: center;
+  }
+  .about-stats {
+    --bs-gutter-y: 40px;
+    padding: 44px 20px;
+  }
+  .about-stats .col:nth-child(odd) {
+    border-left: none;
+  }
+}
+
+@media (max-width: 479.98px) {
+  .about-media {
+    max-width: 100%;
+  }
+  .about-media::before {
+    top: -14px;
+    right: -14px;
+    bottom: 14px;
+    left: 14px;
+  }
+  .about-badge {
+    left: 10px;
+    bottom: -18px;
+    padding: 14px 18px;
+    gap: 10px;
+  }
+  .about-badge-num {
+    font-size: 1.6rem;
+  }
+  .about-badge-label {
+    font-size: 0.8rem;
+    max-width: 76px;
+  }
+  .about-stats {
+    padding: 36px 12px;
+    gap: 34px 0;
+  }
+}
+
+/* ---------- scroll-reveal: accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .js-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .about-badge {
+    animation: none;
+  }
+  .about-media-frame img {
+    transition: none;
+  }
+}
+
+/* ---------- solutions: responsive ---------- */
+@media (max-width: 991.98px) {
+  .solutions {
+    padding: 90px 6vw 100px;
+  }
+}
+
+@media (max-width: 639.98px) {
+  .solution-card {
+    padding: 28px 24px 26px;
+  }
+}
+
+/* ---------- solutions: accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .solution-card {
+    transition: none;
+  }
+  .solution-card::before {
+    display: none;
+  }
+  .solution-card:hover {
+    transform: none;
+  }
+}
+
+/* ---------- products: responsive ---------- */
+@media (max-width: 991.98px) {
+  .products {
+    padding: 90px 6vw 100px;
+  }
+}
+
+/* ---------- products: accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .product-card {
+    transition: none;
+  }
+  .product-device {
+    transition: none;
+  }
+  .pop-in {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+}
+
+/* ---------- industries: responsive ---------- */
+@media (max-width: 991.98px) {
+  .industries {
+    padding: 90px 6vw 100px;
+  }
+}
+
+/* ---------- industries: accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+  }
+  .marquee-track .marquee-group:last-child {
+    display: none;
+  }
+  .industry-card {
+    transition: none;
+  }
+  .industry-card:hover {
+    transform: none;
+  }
+}
+
+/* ---------- reviews: tablets / phones ---------- */
+@media (max-width: 991.98px) {
+  .reviews {
+    padding: 90px 6vw 100px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .reviews-slider {
+    margin: 0 -6px;
+  }
+  .review-slide {
+    padding: 6px 6px 34px;
+  }
+  .review-top {
+    flex-wrap: wrap;
+  }
+  .review-card {
+    padding: 38px 26px 30px;
+  }
+  .review-card::after {
+    font-size: 3.2rem;
+    top: 0;
+    right: 18px;
+  }
+}
+
+/* ---------- reviews: accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .review-card {
+    transition: none;
+  }
+  .review-card:hover {
+    transform: none;
+  }
+  .review-card:hover .review-photo {
+    transform: none;
+  }
+  .review-bar {
+    transition: none;
+    width: 100%;
+  }
+}
+
+/* ---------- faq: tablets / phones ---------- */
+@media (max-width: 991.98px) {
+  .faq {
+    padding: 90px 6vw 100px;
+  }
+  .faq-side {
+    position: static;
+    margin-bottom: 32px;
+  }
+  .faq-question {
+    padding: 18px 20px;
+    font-size: 0.95rem;
+  }
+  .faq-answer p {
+    padding: 0 20px 20px;
+  }
+}
+
+/* ---------- faq: accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .faq-item,
+  .faq-question,
+  .faq-icon,
+  .faq-icon svg,
+  .faq-answer {
+    transition: none;
+  }
+}
+
+/* ---------- contact: tablets / phones ---------- */
+@media (max-width: 991.98px) {
+  .contact-section {
+    padding: 90px 6vw 100px;
+  }
+  .contact-form {
+    padding: 34px 26px;
+  }
+  .contact-info-panel {
+    padding: 34px 13px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .contact-form {
+    padding: 28px 20px;
+  }
+}
+
+/* ---------- contact: accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .status-dot::before {
+    animation: none;
+    opacity: 0.5;
+  }
+  .contact-form .form-control,
+  .contact-form .form-select {
+    transition: none;
+  }
+  .contact-success {
+    animation: none !important;
+  }
+}
+
+/* ---------- footer: tablets / phones ---------- */
+@media (max-width: 991.98px) {
+  .site-footer {
+    padding: 90px 6vw 0;
+  }
+  .footer-brand {
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .footer-bottom {
+    justify-content: center;
+    text-align: center;
+  }
+  .back-to-top {
+    right: 18px;
+    bottom: 18px;
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-shimmer {
+    animation: none;
+  }
+  .footer-logo,
+  .social-icon,
+  .footer-links a,
+  .back-to-top {
+    transition: none;
+  }
+  .footer-logo:hover,
+  .social-icon:hover,
+  .footer-links a:hover,
+  .back-to-top:hover,
+  .back-to-top.is-visible {
+    transform: none;
+  }
+}
+
