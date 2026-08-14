@@ -255,6 +255,12 @@ body {
 /* ---------- mobile nav ---------- */
 
 @media (max-width: 991.98px) {
+  .contact-info-list span {
+    font-size: 12px !important;
+  }
+  .contact-info-list {
+    margin-bottom: 10px !important;
+  }
   .navbar-inner {
     height: 70px;
   }
@@ -2917,7 +2923,7 @@ body {
     padding: 34px 26px;
   }
   .contact-info-panel {
-    padding: 34px 26px;
+    padding: 34px 13px;
   }
 }
 
