@@ -1,276 +1,40 @@
 /* =====================================================================
    Responsive / adaptive rules for SanSo Networks
-   All @media blocks (breakpoints + prefers-reduced-motion) live here,
-   split out of style.css to keep base styles and responsive overrides
-   separate. Load this file AFTER style.css.
+   Mobile-first: style.css holds the mobile default for every rule that
+   changes across breakpoints. Each block below only states the DELTA
+   from the previous (smaller) tier -- properties it doesn't mention
+   keep cascading up from wherever they were last set.
+
+   Breakpoint set (fixed -- do not introduce others):
+     max-width: 320px   -- smallest phones / most cramped viewports
+     max-width: 576px   -- phones
+     min-width: 768px   -- tablets
+     min-width: 1024px  -- small laptops / the old "desktop" cutoff
+     min-width: 1440px  -- standard desktop
+     min-width: 1558px  -- large desktop
+     min-width: 1700px  -- large desktop
+     min-width: 1900px  -- ultra-wide
+     min-width: 2000px  -- ultra-wide
+     min-width: 2100px  -- ultra-wide
+
+   prefers-reduced-motion is a separate, non-breakpoint media feature and
+   is kept in its own section at the end so it keeps applying regardless
+   of viewport width.
    ===================================================================== */
 
-/* ---------- slim navbar on narrower desktop widths so all links + CTA fit ---------- */
-@media (max-width: 1199.98px) and (min-width: 992px) {
-  .navbar-inner {
-    gap: 18px;
-    padding: 0 3.5vw;
-  }
-  .navbar-nav > ul {
-    gap: 4px;
-  }
-  .navbar-nav > ul > li > a {
-    padding: 10px 12px;
-    font-size: 0.86rem;
-  }
-  .btn-cta.navbar-cta {
-    padding: 10px 18px;
-    padding-right: calc(18px + 16px);
-    font-size: 0.72rem;
-  }
-  .btn-cta.navbar-cta::after {
-    right: 18px;
-  }
-}
-
-/* ---------- mobile nav ---------- */
-
-@media (max-width: 991.98px) {
-  .contact-info-list span {
-    font-size: 12px !important;
-  }
-  .contact-info-list {
-    margin-bottom: 10px !important;
-  }
-  .navbar-inner {
-    height: 70px;
-  }
-  .navbar-brand img {
-    height: 38px;
-  }
-  .btn-cta.navbar-cta {
-    display: none;
-  }
-  .navbar-toggle {
-    display: flex;
-  }
-
-  .navbar-nav {
-    position: fixed;
-    top: 70px;
-    left: 0;
-    right: 0;
-    max-height: calc(100vh - 70px);
-    overflow-y: auto;
-    background: rgba(6, 9, 22, 0.97);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    transform: translateY(-12px);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition:
-      opacity 0.3s ease,
-      transform 0.3s ease,
-      visibility 0s linear 0.3s;
-  }
-  .navbar-nav.is-open {
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    transition:
-      opacity 0.3s ease,
-      transform 0.3s ease,
-      visibility 0s linear 0s;
-  }
-
-  .navbar-nav > ul {
-    flex-direction: column;
-    align-items: stretch !important;
-    gap: 0;
-    padding: 10px 6vw 20px;
-  }
-  .navbar-nav > ul > li {
-    display: block !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-  }
-
-  .navbar-nav > ul > li > a {
-    display: block;
-    padding: 16px 4px;
-    width: 100%;
-    border-radius: 0;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
-  }
-  .navbar-nav > ul > li > a::before {
-    display: none;
-  }
-  .navbar-nav > ul > li > a:hover,
-  .navbar-nav > ul > li > a:focus-visible {
-    color: #fff;
-    transform: none;
-  }
-  .navbar-nav > ul > li > a:active {
-    background: rgba(255, 255, 255, 0.06);
-  }
-  .navbar-nav > ul > li > a:focus-visible {
-    box-shadow: inset 0 0 0 2px var(--accent);
-  }
-
-  .navbar-nav > ul > li.has-dropdown > a {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .has-dropdown > a::after {
-    margin-left: 10px;
-  }
-
-  .nav-dropdown {
-    position: static;
-    display: none;
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    box-shadow: none;
-    border: none;
-    background: rgba(255, 255, 255, 0.04);
-    margin: 0 0 10px;
-    transition: none;
-  }
-  .has-dropdown.is-open .nav-dropdown {
-    display: block;
-  }
-  .has-dropdown.is-open > a::after {
-    transform: rotate(-135deg);
-  }
-}
-
-/* ---------- large screens: a little more breathing room ---------- */
-@media (min-width: 1400px) {
-  .hero-caption-inner {
-    max-width: 720px;
-  }
-  .lead-text {
-    max-width: 560px;
-  }
-}
-
-/* ---------- tablets ---------- */
-@media (max-width: 991.98px) {
-  .hero-slider .slide {
-    height: 78vh;
-    min-height: 500px;
-    max-height: 680px;
-  }
-  .hero-caption-inner {
-    max-width: 78%;
-  }
-  .caption-shadow {
-    top: -20px;
-    left: -24px;
-    right: -24px;
-    bottom: -20px;
-  }
-}
-
-@media (max-width: 767.98px) {
-  .hero-slider .slide {
-    height: 92vh;
-    min-height: 520px;
-    max-height: 640px;
-  }
-  .hero-caption-inner {
-    max-width: 100%;
-    left: 7vw;
-    right: 7vw;
-    top: auto;
-    /* the dots pill below is a fixed height pinned 16px from the bottom, so a
-       vw-based offset alone is too small on narrow phones (12vw of 320px is
-       38px -- the pill's top edge sits at ~41px). Floor it so the caption
-       always clears the controls with comfortable margin on every phone. */
-    bottom: max(12vw, 64px);
-    transform: none;
-  }
-  .lead-text {
-    max-width: 100%;
-    margin-bottom: 24px;
-  }
-  .slide-scrim {
-    background: linear-gradient(
-      180deg,
-      rgba(9, 12, 28, 0.25) 0%,
-      rgba(9, 12, 28, 0.9) 55%,
-      rgba(9, 12, 28, 0.95) 100%
-    );
-  }
-  .slider-controls .slick-prev,
-  .slider-controls .slick-next {
-    display: none !important;
-  }
-  .slider-controls {
-    left: 7vw;
-    bottom: 16px;
-  }
-  .caption-shadow {
-    top: -18px;
-    left: -18px;
-    right: -18px;
-    bottom: -18px;
-  }
-}
-
-/* ---------- small phones ---------- */
-@media (max-width: 479.98px) {
-  .eyebrow-icon {
-    width: 24px;
-    height: 24px;
-  }
-  .eyebrow span {
-    font-size: 0.8rem;
-    letter-spacing: 2px;
-  }
-  .slide-caption h1 {
-    font-size: 1.5rem;
-  }
-  .lead-text {
-    font-size: 0.95rem;
-    line-height: 1.6;
-  }
-  .btn-cta,
-  .btn-outline-cta {
-    padding: 12px 22px;
-    padding-right: calc(22px + 18px);
-    font-size: 0.78rem;
-  }
-  .hero-buttons {
-    gap: 12px;
-  }
-  .caption-shadow {
-    top: -14px;
-    left: -14px;
-    right: -14px;
-    bottom: -14px;
-  }
-  .slider-controls {
-    padding: 6px;
-    gap: 10px;
-  }
-  .slider-controls .slick-dots li button {
-    width: 8px;
-    height: 8px;
-  }
-  .slider-controls .slick-dots li button:before {
-    width: 8px;
-    height: 8px;
-  }
-}
-
-@media (max-height: 400px) {
+/* ---------------------------------------------------------------------
+   max-width: 320px -- smallest phones, and the old height-based
+   short-viewport rules folded in here as the closest match (the new
+   scale has no max-height bucket)
+   --------------------------------------------------------------------- */
+@media (max-width: 320px) {
+  /* very short viewports: drop the paragraph so the caption fits --
+     headline + buttons still carry the message */
   .lead-text {
     display: none;
   }
-}
 
-/* ---------- short / landscape viewports (e.g. phone rotated) ---------- */
-@media (max-height: 520px) {
+  /* short / landscape viewports (e.g. phone rotated) */
   .hero-slider .slide {
     height: auto;
     min-height: 100vh;
@@ -298,78 +62,56 @@
   }
 }
 
-/* ---------- partners: tablets / phones ---------- */
-@media (max-width: 991.98px) {
-  .partners {
-    padding: 48px 6vw 56px;
+/* ---------------------------------------------------------------------
+   max-width: 576px -- phones (folds in the old "small phones" tier)
+   --------------------------------------------------------------------- */
+@media (max-width: 576px) {
+  .eyebrow-icon {
+    width: 24px;
+    height: 24px;
   }
-  .partners-header {
-    margin-bottom: 32px;
+  .eyebrow span {
+    font-size: 0.8rem;
+    letter-spacing: 2px;
   }
-}
-
-/* ---------- partners: accessibility ---------- */
-@media (prefers-reduced-motion: reduce) {
-  .partners-track {
-    animation: none;
-    flex-wrap: wrap;
-    justify-content: center;
+  .slide-caption h1 {
+    font-size: 1.5rem;
+  }
+  .lead-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .btn-cta,
+  .btn-outline-cta {
+    padding: 12px 22px; /* symmetric */
+    font-size: 0.78rem;
+  }
+  .btn-cta:hover,
+  .btn-outline-cta:hover {
+    padding-right: 48px;
+  }
+  .hero-buttons {
     gap: 12px;
-    width: 100%;
   }
-  .partners-track .partners-group:last-child {
-    display: none;
+  .caption-shadow {
+    top: -14px;
+    left: -14px;
+    right: -14px;
+    bottom: -14px;
   }
-  .partner-item {
-    transition: none;
+  .slider-controls {
+    padding: 6px;
+    gap: 10px;
   }
-  .partner-item:hover {
-    transform: none;
+  .slider-controls .slick-dots li button {
+    width: 8px;
+    height: 8px;
   }
-}
+  .slider-controls .slick-dots li button:before {
+    width: 8px;
+    height: 8px;
+  }
 
-/* ---------- about: tablets / phones ---------- */
-@media (max-width: 991.98px) {
-  .about {
-    padding: 90px 6vw 100px;
-  }
-  .about-header {
-    margin-bottom: 56px;
-  }
-  .about-grid {
-    --bs-gutter-x: 64px;
-    --bs-gutter-y: 64px;
-  }
-  .about-media {
-    max-width: 560px;
-    margin: 0 auto;
-  }
-  .about-heading,
-  .about-body > p {
-    text-align: center;
-  }
-  .cisco-badge {
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .about-points {
-    max-width: 430px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .about-cta {
-    justify-content: center;
-  }
-  .about-stats {
-    --bs-gutter-y: 40px;
-    padding: 44px 20px;
-  }
-  .about-stats .col:nth-child(odd) {
-    border-left: none;
-  }
-}
-
-@media (max-width: 479.98px) {
   .about-media {
     max-width: 100%;
   }
@@ -398,8 +140,417 @@
   }
 }
 
-/* ---------- scroll-reveal: accessibility ---------- */
+/* ---------------------------------------------------------------------
+   min-width: 768px -- tablets: this is where the old ≤991.98px tier's
+   values (distinct from the phone/≤767.98px values now in the mobile
+   default) get restored for the tablet range
+   --------------------------------------------------------------------- */
+@media (min-width: 768px) {
+  .hero-slider .slide {
+    height: 78vh;
+    min-height: 500px;
+    max-height: 680px;
+  }
+  .hero-caption-inner {
+    max-width: 78%;
+  }
+  .lead-text {
+    max-width: 520px;
+    margin-bottom: 32px;
+  }
+  .slide-scrim {
+    background:
+      linear-gradient(
+        100deg,
+        rgba(9, 12, 28, 0.55) 0%,
+        rgba(9, 12, 28, 0.32) 32%,
+        rgba(9, 12, 28, 0.1) 55%,
+        rgba(9, 12, 28, 0) 72%
+      ),
+      linear-gradient(0deg, rgba(9, 12, 28, 0.35) 0%, rgba(9, 12, 28, 0) 26%);
+  }
+  .slider-controls {
+    left: 5vw;
+    bottom: 28px;
+  }
+  .slider-controls .slick-prev,
+  .slider-controls .slick-next {
+    display: flex !important;
+  }
+  .caption-shadow {
+    top: -20px;
+    left: -24px;
+    right: -24px;
+    bottom: -20px;
+  }
+
+  /* .about's 6vw side padding is comfortably wider than half this gutter
+     from here up, so it's safe to restore the roomier tablet spacing */
+  .about-grid {
+    --bs-gutter-x: 64px;
+    --bs-gutter-y: 64px;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   min-width: 1024px -- small laptops and up: the old ~992px "desktop"
+   cutoff. This is where the navbar switches from the mobile stacked
+   menu to the horizontal pill nav with hover dropdown, and where every
+   section restores its full desktop spacing.
+   --------------------------------------------------------------------- */
+@media (min-width: 1024px) {
+  /* ---------- navbar ---------- */
+  .navbar-nav {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+    background: transparent;
+    backdrop-filter: none;
+    border-bottom: none;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: none;
+  }
+  .navbar-inner {
+    height: 82px;
+    padding: 0 3.5vw;
+    gap: 18px;
+  }
+  .navbar-brand img {
+    height: 46px;
+  }
+  .navbar-nav > ul {
+    flex-direction: row;
+    align-items: center !important;
+    gap: 4px;
+    padding: 0;
+  }
+  .navbar-nav > ul > li {
+    display: flex !important;
+    border-bottom: none;
+  }
+  .navbar-nav > ul > li > a {
+    display: inline-block;
+    padding: 10px 12px;
+    width: auto;
+    border-radius: 999px;
+    font-size: 0.86rem;
+    -webkit-tap-highlight-color: initial;
+    outline: revert;
+  }
+  .navbar-nav > ul > li > a::before {
+    display: block;
+  }
+  .navbar-nav > ul > li > a:hover {
+    transform: translateY(-2px);
+  }
+  .navbar-nav > ul > li > a:focus-visible {
+    box-shadow: none;
+  }
+  .navbar-nav > ul > li.has-dropdown > a {
+    display: inline-block;
+  }
+  .nav-dropdown {
+    display: block; /* was staying display:none from the mobile default -- broke hover */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin: 0;
+    background: rgba(8, 11, 26, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 24px 46px -18px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition:
+      opacity 0.28s ease,
+      transform 0.28s cubic-bezier(0.25, 0.8, 0.25, 1),
+      visibility 0s linear 0.28s;
+  }
+  .btn-cta.navbar-cta {
+    display: inline-flex;
+    padding: 10px 18px; /* symmetric */
+    font-size: 0.72rem;
+  }
+  .btn-cta.navbar-cta:hover {
+    padding-right: 42px;
+  }
+  .btn-cta.navbar-cta::after {
+    right: 16px;
+  }
+  .navbar-toggle {
+    display: none;
+  }
+
+  /* ---------- hero ---------- */
+  .hero-slider .slide {
+    height: 82vh;
+    min-height: 560px;
+    max-height: 700px;
+  }
+  .hero-caption-inner {
+    max-width: 640px;
+    top: 50%;
+    left: 5vw;
+    right: 5vw;
+    bottom: auto;
+    transform: translateY(-50%);
+  }
+  .caption-shadow {
+    top: -24px;
+    left: -30px;
+    right: -30px;
+    bottom: -24px;
+  }
+
+  /* ---------- our partners ---------- */
+  .partners {
+    padding: 56px 5vw 64px;
+  }
+  .partners-header {
+    margin-bottom: 40px;
+  }
+
+  /* ---------- about ---------- */
+  .about {
+    padding: 120px 5vw 130px;
+  }
+  .about-header {
+    margin: 0 auto 68px;
+  }
+  .about-grid {
+    --bs-gutter-x: 76px;
+    --bs-gutter-y: 0;
+  }
+  .about-media {
+    max-width: none;
+    margin: 0;
+  }
+  /* right at this crossover the two-column layout leaves barely enough
+     margin for the badge's usual -22px hang-off (it clips off-screen);
+     ease it in, then min-width: 1440px below restores the full amount
+     once there's comfortably more room */
+  .about-badge {
+    left: -10px;
+  }
+  .about-heading,
+  .about-body > p {
+    text-align: left;
+  }
+  .cisco-badge {
+    margin: 0 0 28px;
+  }
+  .about-points {
+    max-width: none;
+    margin: 0 0 34px;
+  }
+  .about-cta {
+    justify-content: flex-start;
+  }
+  .about-stats {
+    padding: 48px 28px;
+    --bs-gutter-y: 24px;
+  }
+  .about-stats .col:nth-child(odd) {
+    border-left: 1px solid rgba(255, 255, 255, 0.09);
+  }
+  .about-stats .col:first-child {
+    border-left: none;
+  }
+
+  /* ---------- solutions ---------- */
+  .solutions {
+    padding: 120px 5vw 130px;
+  }
+  .solution-card {
+    padding: 34px 30px 30px;
+  }
+
+  /* ---------- products ---------- */
+  .products {
+    padding: 120px 5vw 130px;
+  }
+
+  /* ---------- industries ---------- */
+  .industries {
+    padding: 120px 5vw 130px;
+  }
+
+  /* ---------- client reviews ---------- */
+  .reviews {
+    padding: 120px 5vw 130px;
+  }
+  .reviews-slider {
+    margin: 0 -18px;
+  }
+  .review-slide {
+    padding: 8px 18px 40px;
+  }
+  .review-top {
+    flex-wrap: nowrap;
+  }
+  .review-card {
+    padding: 48px 38px 38px;
+  }
+  .review-card::after {
+    top: 2px;
+    right: 22px;
+    font-size: 3.8rem;
+  }
+
+  /* ---------- faq ---------- */
+  .faq {
+    padding: 120px 5vw 130px;
+  }
+  .faq-side {
+    position: sticky;
+    top: 116px;
+    margin-bottom: 0;
+  }
+  .faq-question {
+    padding: 22px 24px;
+    font-size: 1rem;
+  }
+  .faq-answer p {
+    padding: 0 24px 24px;
+  }
+
+  /* ---------- contact ---------- */
+  .contact-section {
+    padding: 120px 5vw 130px;
+  }
+  .contact-form {
+    padding: 44px;
+  }
+  .contact-info-panel {
+    padding: 44px 40px;
+  }
+  .contact-info-list {
+    margin-bottom: 36px !important;
+  }
+  .contact-info-list span {
+    font-size: 0.92rem !important;
+  }
+
+  /* ---------- footer ---------- */
+  .site-footer {
+    padding: 100px 5vw 0;
+  }
+  .footer-brand {
+    margin-bottom: 0;
+  }
+  .footer-bottom {
+    justify-content: space-between;
+    text-align: left;
+  }
+  .back-to-top {
+    right: 28px;
+    bottom: 28px;
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   min-width: 1440px -- standard desktop: a little more breathing room
+   for the hero caption + the navbar's most spacious state
+   --------------------------------------------------------------------- */
+@media (min-width: 1440px) {
+  .navbar-inner {
+    padding: 0 5vw;
+    gap: 32px;
+  }
+  .navbar-nav > ul {
+    gap: 10px;
+  }
+  .navbar-nav > ul > li > a {
+    padding: 11px 18px;
+    font-size: 0.92rem;
+  }
+  .btn-cta.navbar-cta {
+    padding: 11px 24px; /* symmetric */
+    font-size: 0.78rem;
+  }
+  .btn-cta.navbar-cta:hover {
+    padding-right: 50px;
+  }
+  .btn-cta.navbar-cta::after {
+    right: 20px;
+  }
+
+  .hero-caption-inner {
+    max-width: 720px;
+  }
+  .lead-text {
+    max-width: 560px;
+  }
+
+  .about-badge {
+    left: -22px;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   min-width: 1558px -- large desktop
+   (no site-specific overrides yet -- scaffolded for future use)
+   --------------------------------------------------------------------- */
+@media (min-width: 1558px) {
+}
+
+/* ---------------------------------------------------------------------
+   min-width: 1700px -- large desktop
+   (no site-specific overrides yet -- scaffolded for future use)
+   --------------------------------------------------------------------- */
+@media (min-width: 1700px) {
+}
+
+/* ---------------------------------------------------------------------
+   min-width: 1900px -- ultra-wide
+   (no site-specific overrides yet -- scaffolded for future use)
+   --------------------------------------------------------------------- */
+@media (min-width: 1900px) {
+}
+
+/* ---------------------------------------------------------------------
+   min-width: 2000px -- ultra-wide
+   (no site-specific overrides yet -- scaffolded for future use)
+   --------------------------------------------------------------------- */
+@media (min-width: 2000px) {
+}
+
+/* ---------------------------------------------------------------------
+   min-width: 2100px -- ultra-wide
+   (no site-specific overrides yet -- scaffolded for future use)
+   --------------------------------------------------------------------- */
+@media (min-width: 2100px) {
+}
+
+/* =====================================================================
+   Accessibility -- prefers-reduced-motion: reduce
+   Not a breakpoint, so kept out of the 10 categories above; applies at
+   every viewport width regardless of which breakpoint is active.
+   ===================================================================== */
 @media (prefers-reduced-motion: reduce) {
+  .partners-track {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+  }
+  .partners-track .partners-group:last-child {
+    display: none;
+  }
+  .partner-item {
+    transition: none;
+  }
+  .partner-item:hover {
+    transform: none;
+  }
+
   .js-reveal {
     opacity: 1;
     transform: none;
@@ -411,23 +562,7 @@
   .about-media-frame img {
     transition: none;
   }
-}
 
-/* ---------- solutions: responsive ---------- */
-@media (max-width: 991.98px) {
-  .solutions {
-    padding: 90px 6vw 100px;
-  }
-}
-
-@media (max-width: 639.98px) {
-  .solution-card {
-    padding: 28px 24px 26px;
-  }
-}
-
-/* ---------- solutions: accessibility ---------- */
-@media (prefers-reduced-motion: reduce) {
   .solution-card {
     transition: none;
   }
@@ -437,17 +572,7 @@
   .solution-card:hover {
     transform: none;
   }
-}
 
-/* ---------- products: responsive ---------- */
-@media (max-width: 991.98px) {
-  .products {
-    padding: 90px 6vw 100px;
-  }
-}
-
-/* ---------- products: accessibility ---------- */
-@media (prefers-reduced-motion: reduce) {
   .product-card {
     transition: none;
   }
@@ -458,17 +583,7 @@
     opacity: 1 !important;
     animation: none !important;
   }
-}
 
-/* ---------- industries: responsive ---------- */
-@media (max-width: 991.98px) {
-  .industries {
-    padding: 90px 6vw 100px;
-  }
-}
-
-/* ---------- industries: accessibility ---------- */
-@media (prefers-reduced-motion: reduce) {
   .marquee-track {
     animation: none;
     flex-wrap: wrap;
@@ -485,37 +600,7 @@
   .industry-card:hover {
     transform: none;
   }
-}
 
-/* ---------- reviews: tablets / phones ---------- */
-@media (max-width: 991.98px) {
-  .reviews {
-    padding: 90px 6vw 100px;
-  }
-}
-
-@media (max-width: 575.98px) {
-  .reviews-slider {
-    margin: 0 -6px;
-  }
-  .review-slide {
-    padding: 6px 6px 34px;
-  }
-  .review-top {
-    flex-wrap: wrap;
-  }
-  .review-card {
-    padding: 38px 26px 30px;
-  }
-  .review-card::after {
-    font-size: 3.2rem;
-    top: 0;
-    right: 18px;
-  }
-}
-
-/* ---------- reviews: accessibility ---------- */
-@media (prefers-reduced-motion: reduce) {
   .review-card {
     transition: none;
   }
@@ -529,28 +614,7 @@
     transition: none;
     width: 100%;
   }
-}
 
-/* ---------- faq: tablets / phones ---------- */
-@media (max-width: 991.98px) {
-  .faq {
-    padding: 90px 6vw 100px;
-  }
-  .faq-side {
-    position: static;
-    margin-bottom: 32px;
-  }
-  .faq-question {
-    padding: 18px 20px;
-    font-size: 0.95rem;
-  }
-  .faq-answer p {
-    padding: 0 20px 20px;
-  }
-}
-
-/* ---------- faq: accessibility ---------- */
-@media (prefers-reduced-motion: reduce) {
   .faq-item,
   .faq-question,
   .faq-icon,
@@ -558,29 +622,7 @@
   .faq-answer {
     transition: none;
   }
-}
 
-/* ---------- contact: tablets / phones ---------- */
-@media (max-width: 991.98px) {
-  .contact-section {
-    padding: 90px 6vw 100px;
-  }
-  .contact-form {
-    padding: 34px 26px;
-  }
-  .contact-info-panel {
-    padding: 34px 13px;
-  }
-}
-
-@media (max-width: 575.98px) {
-  .contact-form {
-    padding: 28px 20px;
-  }
-}
-
-/* ---------- contact: accessibility ---------- */
-@media (prefers-reduced-motion: reduce) {
   .status-dot::before {
     animation: none;
     opacity: 0.5;
@@ -592,32 +634,7 @@
   .contact-success {
     animation: none !important;
   }
-}
 
-/* ---------- footer: tablets / phones ---------- */
-@media (max-width: 991.98px) {
-  .site-footer {
-    padding: 90px 6vw 0;
-  }
-  .footer-brand {
-    margin-bottom: 8px;
-  }
-}
-
-@media (max-width: 575.98px) {
-  .footer-bottom {
-    justify-content: center;
-    text-align: center;
-  }
-  .back-to-top {
-    right: 18px;
-    bottom: 18px;
-    width: 44px;
-    height: 44px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
   .footer-shimmer {
     animation: none;
   }
@@ -635,4 +652,3 @@
     transform: none;
   }
 }
-

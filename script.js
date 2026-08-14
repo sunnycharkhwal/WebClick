@@ -24,7 +24,7 @@ $(function () {
   });
 
   $nav.find(".has-dropdown > a").on("click", function (e) {
-    if (window.matchMedia("(max-width: 991.98px)").matches) {
+    if (window.matchMedia("(max-width: 1023.98px)").matches) {
       e.preventDefault();
       $(this).parent().toggleClass("is-open");
     }

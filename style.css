@@ -33,6 +33,12 @@ body {
   background: rgba(4, 6, 16, 0.45);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(10px);
+  /* forces its own stable GPU compositing layer -- without this, a fixed
+     backdrop-filter element scrolling over other content can occasionally
+     lose track of what to paint under certain zoom/scale conditions
+     (a known Chromium bug class), corrupting content further down the page */
+  transform: translateZ(0);
+  will-change: backdrop-filter;
   transition:
     background 0.3s ease,
     box-shadow 0.3s ease;
@@ -42,30 +48,74 @@ body {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 5vw;
-  height: 82px;
+  height: 70px; /* mobile default; restored to 82px at min-width: 1024px */
   gap: 32px;
 }
 
 .navbar-brand img {
-  height: 46px;
+  height: 38px; /* mobile default; restored to 46px at min-width: 1024px */
   width: auto;
   display: block;
 }
 
+/* mobile default: hidden fixed-position panel, toggled open by the hamburger */
+.navbar-nav {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  max-height: calc(100vh - 70px);
+  overflow-y: auto;
+  background: rgba(6, 9, 22, 0.97);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transform: translateY(-12px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease,
+    visibility 0s linear 0.3s;
+}
+.navbar-nav.is-open {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease,
+    visibility 0s linear 0s;
+}
+
+/* mobile default: stacked full-width menu (nav toggle is what shows it) */
 .navbar-nav > ul {
-  gap: 10px;
+  flex-direction: column;
+  align-items: stretch !important; /* beats Bootstrap's align-items-center utility on the <ul> */
+  gap: 0;
+  padding: 10px 6vw 20px;
+}
+
+.navbar-nav > ul > li {
+  display: block !important; /* beats Bootstrap's d-flex utility on the <li> */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .navbar-nav > ul > li > a {
+  display: block;
   position: relative;
   z-index: 1;
-  padding: 11px 18px;
-  border-radius: 999px;
+  padding: 16px 4px;
+  width: 100%;
+  border-radius: 0;
   color: #fff;
   font-weight: 600;
   font-size: 0.92rem;
   letter-spacing: 0.3px;
   text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
   transition:
     color 0.3s ease,
     transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -73,6 +123,7 @@ body {
 
 .navbar-nav > ul > li > a::before {
   content: "";
+  display: none; /* the hover pill glow only makes sense on the desktop nav */
   position: absolute;
   inset: 0;
   z-index: -1;
@@ -87,14 +138,24 @@ body {
 .navbar-nav > ul > li > a:hover,
 .navbar-nav > ul > li > a:focus-visible {
   color: #fff;
+  transform: none;
 }
 .navbar-nav > ul > li > a:hover::before,
 .navbar-nav > ul > li > a:focus-visible::before {
   opacity: 1;
   transform: scale(1);
 }
-.navbar-nav > ul > li > a:hover {
-  transform: translateY(-2px);
+.navbar-nav > ul > li > a:active {
+  background: rgba(255, 255, 255, 0.06);
+}
+.navbar-nav > ul > li > a:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.navbar-nav > ul > li.has-dropdown > a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .has-dropdown > a::after {
@@ -108,32 +169,32 @@ body {
   transform: rotate(45deg);
   transition: transform 0.3s ease;
 }
-.has-dropdown:hover > a::after {
+.has-dropdown:hover > a::after,
+.has-dropdown.is-open > a::after {
   transform: rotate(-135deg);
 }
 
-/* ---------- dropdown panel: fades + slides down on hover ---------- */
+/* ---------- dropdown panel: static stacked list on mobile, fades + slides
+   down on hover once restored to a flyout at min-width: 1024px ---------- */
 
 .nav-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
+  position: static;
+  display: none;
   min-width: 260px;
-  margin: 0;
+  margin: 0 0 10px;
   padding: 10px;
   list-style: none;
-  background: rgba(8, 11, 26, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  border: none;
   border-radius: 12px;
-  box-shadow: 0 24px 46px -18px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(10px);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(10px);
-  transition:
-    opacity 0.28s ease,
-    transform 0.28s cubic-bezier(0.25, 0.8, 0.25, 1),
-    visibility 0s linear 0.28s;
+  box-shadow: none;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: none;
+}
+.has-dropdown.is-open .nav-dropdown {
+  display: block;
 }
 .has-dropdown:hover > .nav-dropdown,
 .has-dropdown:focus-within > .nav-dropdown {
@@ -189,16 +250,19 @@ body {
 /* ---------- CTA + hamburger toggle ---------- */
 
 .btn-cta.navbar-cta {
-  padding: 11px 24px;
-  padding-right: calc(24px + 18px);
+  display: none; /* mobile default: hidden, shown again at min-width: 1024px */
+  padding: 11px 24px; /* symmetric */
   font-size: 0.78rem;
 }
+.btn-cta.navbar-cta:hover {
+  padding-right: 50px;
+}
 .btn-cta.navbar-cta::after {
-  right: 24px;
+  right: 20px;
 }
 
 .navbar-toggle {
-  display: none;
+  display: flex; /* mobile default: hamburger visible, hidden at min-width: 1024px */
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -245,9 +309,9 @@ body {
 
 .hero-slider .slide {
   position: relative;
-  height: 82vh;
-  min-height: 560px;
-  max-height: 700px;
+  height: 92vh; /* mobile default */
+  min-height: 520px;
+  max-height: 640px;
 }
 
 .slide-bg {
@@ -273,15 +337,13 @@ body {
 .slide-scrim {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(
-      100deg,
-      rgba(9, 12, 28, 0.55) 0%,
-      rgba(9, 12, 28, 0.32) 32%,
-      rgba(9, 12, 28, 0.1) 55%,
-      rgba(9, 12, 28, 0) 72%
-    ),
-    linear-gradient(0deg, rgba(9, 12, 28, 0.35) 0%, rgba(9, 12, 28, 0) 26%);
+  /* mobile default: vertical scrim so light text stays readable over the photo */
+  background: linear-gradient(
+    180deg,
+    rgba(9, 12, 28, 0.25) 0%,
+    rgba(9, 12, 28, 0.9) 55%,
+    rgba(9, 12, 28, 0.95) 100%
+  );
 }
 
 /* ---------- CAPTION: sits on top of the image ---------- */
@@ -294,12 +356,17 @@ body {
 }
 
 .hero-caption-inner {
-  max-width: 640px;
+  max-width: 100%; /* mobile default */
   position: absolute;
-  top: 50%;
-  left: 5vw;
-  right: 5vw;
-  transform: translateY(-50%);
+  top: auto;
+  left: 7vw;
+  right: 7vw;
+  /* the dots pill below is a fixed height pinned 16px from the bottom, so a
+     vw-based offset alone is too small on narrow phones (12vw of 320px is
+     38px -- the pill's top edge sits at ~41px). Floor it so the caption
+     always clears the controls with comfortable margin on every phone. */
+  bottom: max(12vw, 64px);
+  transform: none;
 }
 
 .eyebrow {
@@ -336,8 +403,8 @@ body {
   font-size: 1.05rem;
   color: rgba(255, 255, 255, 0.85);
   line-height: 1.7;
-  margin-bottom: 32px;
-  max-width: 520px;
+  margin-bottom: 24px; /* mobile default */
+  max-width: 100%;
 }
 
 /* ---------- hero buttons: lift + shine-sweep + arrow reveal on hover ---------- */
@@ -349,20 +416,28 @@ body {
   isolation: isolate;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   font-weight: 600;
   letter-spacing: 0.5px;
-  padding: 14px 30px;
+  padding: 14px 30px; /* symmetric -- text stays centered at rest */
   border-radius: 8px;
   text-transform: uppercase;
   font-size: 0.85rem;
 
-  padding-right: calc(30px + 20px);
   transition:
     transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
     box-shadow 0.35s ease,
     background-color 0.3s ease,
     color 0.3s ease,
-    border-color 0.3s ease;
+    border-color 0.3s ease,
+    padding-right 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* only reserve room for the arrow once it's actually revealing on hover,
+   so idle buttons never sit off-center */
+.btn-cta:hover,
+.btn-outline-cta:hover {
+  padding-right: 58px;
 }
 
 /* diagonal shine that sweeps across on hover */
@@ -382,17 +457,33 @@ body {
   transform: translateX(130%) skewX(-20deg);
 }
 
+/* arrow icon -- a masked SVG (not a text glyph) so its rendered size is
+   exact and consistent across browsers/fonts, with a real gap from the
+   label instead of a character that can crowd right up against it */
 .btn-cta::after,
 .btn-outline-cta::after {
-  content: "\2192";
+  content: "";
+  display: block;
+  width: 16px;
+  height: 16px;
   position: absolute;
-  right: 30px;
+  right: 24px;
   top: 50%;
+  background-color: currentColor;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
   transform: translate(-6px, -50%);
   opacity: 0;
   transition:
     transform 0.3s ease,
-    opacity 0.3s ease;
+    opacity 0.3s ease,
+    background-color 0.3s ease;
 }
 .btn-cta:hover::after,
 .btn-outline-cta:hover::after {
@@ -454,10 +545,11 @@ body {
 
 .caption-shadow {
   position: absolute;
-  top: -24px;
-  left: -30px;
-  right: -30px;
-  bottom: -24px;
+  /* mobile default */
+  top: -18px;
+  left: -18px;
+  right: -18px;
+  bottom: -18px;
   z-index: -1;
   opacity: 0;
   background: rgba(4, 6, 16, 0.55);
@@ -527,8 +619,8 @@ body {
 
 .slider-controls {
   position: absolute;
-  left: 5vw;
-  bottom: 28px;
+  left: 7vw; /* mobile default */
+  bottom: 16px;
   z-index: 5;
   gap: 14px;
   padding: 8px;
@@ -536,10 +628,15 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 999px;
   backdrop-filter: blur(6px);
+  transform: translateZ(0); /* stabilize compositing, see .site-header */
+  will-change: backdrop-filter;
 }
 
 .slider-controls .slick-prev,
 .slider-controls .slick-next {
+  display: none !important; /* mobile default: arrows hidden, dots-only */
+  align-items: center;
+  justify-content: center;
   position: static;
   z-index: auto;
   width: 36px;
@@ -564,11 +661,29 @@ body {
 .slider-controls .slick-next {
   order: 3;
 }
+
+/* replace Slick's default icon-font glyph with a chevron that matches the
+   site's hand-drawn SVG icon language everywhere else (thin, round-capped
+   stroke) -- a mask so hover can simply swap background-color */
 .slider-controls .slick-prev:before,
 .slider-controls .slick-next:before {
-  color: #fff;
-  font-size: 16px;
+  content: "";
+  display: block;
+  width: 14px;
+  height: 14px;
+  background-color: #fff;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
   opacity: 1;
+}
+.slider-controls .slick-prev:before {
+  transform: scaleX(-1); /* mirror the same chevron instead of a second icon */
 }
 
 .slider-controls .slick-dots {
@@ -607,11 +722,6 @@ body {
   transform: scale(1.25);
 }
 
-/* ---------- very short viewports: drop the paragraph so the caption fits ----------
-   The lead is the first thing to go on short screens -- headline + buttons
-   still carry the message, and hiding it keeps the caption clear of the
-   slider controls even with long copy (e.g. landscape phones). */
-
 /* ================= OUR PARTNERS ================= */
 /* Compact dark strip bridging the hero into the white About section --
    deliberately thin/no-scroll-anchor, reusing the industries marquee's
@@ -619,7 +729,7 @@ body {
 
 .partners {
   position: relative;
-  padding: 56px 5vw 64px;
+  padding: 48px 6vw 56px; /* mobile default */
   background: linear-gradient(180deg, #0b1030 0%, var(--navy) 100%);
   overflow: hidden;
 }
@@ -630,7 +740,7 @@ body {
 }
 
 .partners-header {
-  margin-bottom: 40px;
+  margin-bottom: 32px; /* mobile default */
 }
 .partners-eyebrow {
   justify-content: center;
@@ -727,7 +837,7 @@ body {
 
 .about {
   position: relative;
-  padding: 120px 5vw 130px;
+  padding: 90px 6vw 100px; /* mobile default */
   background: #fff;
   overflow: hidden;
 }
@@ -760,7 +870,7 @@ body {
 
 .about-header {
   max-width: 720px;
-  margin: 0 auto 68px;
+  margin: 0 auto 56px; /* mobile default */
 }
 
 .about-title {
@@ -780,13 +890,19 @@ body {
 /* ---------- media + story columns ---------- */
 
 .about-grid {
-  --bs-gutter-x: 76px;
-  --bs-gutter-y: 0;
+  /* mobile default -- kept small so the row's negative Bootstrap gutter
+     margin never exceeds .about's own 6vw side padding on narrow phones
+     (a bigger gutter here bleeds the column past the viewport edge and
+     drags the floating badge flush against the screen edge with it) */
+  --bs-gutter-x: 24px;
+  --bs-gutter-y: 40px;
 }
 
 .about-media {
   position: relative;
   z-index: 0;
+  max-width: 560px; /* mobile default */
+  margin: 0 auto;
 }
 
 /* peach frame peeking out at the top + right of the photo */
@@ -872,19 +988,21 @@ body {
   line-height: 1.3;
   color: var(--navy);
   margin-bottom: 18px;
+  text-align: center; /* mobile default */
 }
 
 .about-body > p {
   color: rgba(22, 25, 44, 0.75);
   line-height: 1.8;
   margin-bottom: 26px;
+  text-align: center; /* mobile default */
 }
 
 /* real Cisco Partner certification badge -- backs up the "trusted Cisco
    Partner" claim in the paragraph above with the actual credential */
 .cisco-badge {
   width: fit-content;
-  margin: 0 0 28px;
+  margin: 0 auto 28px; /* mobile default: centered */
   padding: 12px 20px 12px 12px;
   border: 1px solid rgba(19, 26, 58, 0.08);
   border-radius: 14px;
@@ -918,10 +1036,11 @@ body {
 
 .about-points {
   list-style: none;
-  margin: 0 0 34px;
+  margin: 0 auto 34px; /* mobile default: centered */
   padding: 0;
   display: grid;
   gap: 14px;
+  max-width: 430px; /* mobile default */
 }
 
 .about-points li {
@@ -952,8 +1071,12 @@ body {
 }
 
 /* .about-cta layout is plain Bootstrap utilities (d-flex flex-wrap gap-3)
-   on the element itself -- no custom CSS needed.
-   outline button needs a navy variant -- the base style is tuned for dark
+   on the element itself; justify-content is the one override we need. */
+.about-cta {
+  justify-content: center; /* mobile default */
+}
+
+/* outline button needs a navy variant -- the base style is tuned for dark
    hero backgrounds (white border/text) and would vanish on white */
 .about .btn-outline-cta {
   color: var(--navy);
@@ -976,10 +1099,10 @@ body {
     #1a2350 100%
   );
   border-radius: 22px;
-  padding: 48px 28px;
+  padding: 44px 20px; /* mobile default */
   box-shadow: 0 30px 60px -30px rgba(19, 26, 58, 0.5);
   --bs-gutter-x: 24px;
-  --bs-gutter-y: 24px;
+  --bs-gutter-y: 40px;
 }
 
 /* hairline dividers between stats (Bootstrap .row-cols handles the columns) */
@@ -988,6 +1111,9 @@ body {
 }
 .about-stats .col:first-child {
   border-left: none;
+}
+.about-stats .col:nth-child(odd) {
+  border-left: none; /* mobile default: 2-up grid, so odd columns start a new row */
 }
 
 .stat-num {
@@ -1068,7 +1194,7 @@ body {
 
 .solutions {
   position: relative;
-  padding: 120px 5vw 130px;
+  padding: 90px 6vw 100px; /* mobile default */
   background:
     radial-gradient(
       720px 420px at 88% 0%,
@@ -1131,7 +1257,7 @@ body {
 .solution-card {
   position: relative;
   overflow: hidden;
-  padding: 34px 30px 30px;
+  padding: 28px 24px 26px; /* mobile default */
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1255,7 +1381,7 @@ body {
 
 .products {
   position: relative;
-  padding: 120px 5vw 130px;
+  padding: 90px 6vw 100px; /* mobile default */
   background: #fff;
   overflow: hidden;
 }
@@ -1472,6 +1598,19 @@ body {
   margin-bottom: 22px;
 }
 
+/* outline button needs a navy variant here too -- the base style is tuned
+   for dark hero backgrounds (white border/text) and vanishes on this
+   section's white background otherwise */
+.products .btn-outline-cta {
+  color: var(--navy);
+  border-color: var(--navy);
+}
+.products .btn-outline-cta:hover {
+  background: var(--navy);
+  color: #fff;
+  box-shadow: 0 16px 30px -12px rgba(19, 26, 58, 0.5);
+}
+
 /* ================= INDUSTRIES ================= */
 
 #industries {
@@ -1480,7 +1619,7 @@ body {
 
 .industries {
   position: relative;
-  padding: 120px 5vw 130px;
+  padding: 90px 6vw 100px; /* mobile default */
   background:
     radial-gradient(
       640px 400px at 8% 0%,
@@ -1662,7 +1801,7 @@ body {
 
 .reviews {
   position: relative;
-  padding: 120px 5vw 130px;
+  padding: 90px 6vw 100px; /* mobile default */
   background: #fff;
   overflow: hidden;
 }
@@ -1728,7 +1867,7 @@ body {
 /* ---------- slider ---------- */
 
 .reviews-slider {
-  margin: 0 -18px;
+  margin: 0 -6px; /* mobile default */
 }
 
 /* equal-height slides: Slick floats slides by default, so force the track
@@ -1744,7 +1883,7 @@ body {
 
 .review-slide {
   height: auto;
-  padding: 8px 18px 40px;
+  padding: 6px 6px 34px; /* mobile default */
 }
 
 /* ---------- slider controls: prev / dots / next grouped into one pill,
@@ -1759,6 +1898,9 @@ body {
 
 .reviews-slider-controls .slick-prev,
 .reviews-slider-controls .slick-next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: static;
   z-index: auto;
   width: 52px;
@@ -1788,16 +1930,33 @@ body {
 .reviews-slider-controls .slick-next {
   order: 3;
 }
+
+/* same custom chevron as the hero slider, in navy (white on hover) to match
+   this section's light-card palette */
 .reviews-slider-controls .slick-prev:before,
 .reviews-slider-controls .slick-next:before {
-  color: var(--navy);
-  font-size: 20px;
+  content: "";
+  display: block;
+  width: 16px;
+  height: 16px;
+  background-color: var(--navy);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
   opacity: 1;
-  transition: color 0.2s ease;
+  transition: background-color 0.2s ease;
+}
+.reviews-slider-controls .slick-prev:before {
+  transform: scaleX(-1);
 }
 .reviews-slider-controls .slick-prev:hover:before,
 .reviews-slider-controls .slick-next:hover:before {
-  color: #fff;
+  background-color: #fff;
 }
 
 .reviews-slider-controls .slick-dots {
@@ -1842,7 +2001,7 @@ body {
   position: relative;
   flex: 1;
   height: 100%;
-  padding: 48px 38px 38px;
+  padding: 38px 26px 30px; /* mobile default */
   border: 1px solid rgba(19, 26, 58, 0.08);
   border-radius: 18px;
   background: #fff;
@@ -1863,10 +2022,10 @@ body {
 .review-card::after {
   content: "\201C\201D";
   position: absolute;
-  top: 2px;
-  right: 22px;
+  top: 0; /* mobile default */
+  right: 18px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 3.8rem;
+  font-size: 3.2rem; /* mobile default */
   line-height: 1;
   color: var(--accent);
   opacity: 0.14;
@@ -1876,6 +2035,7 @@ body {
 .review-top {
   gap: 16px;
   margin-bottom: 20px;
+  flex-wrap: wrap; /* mobile default */
 }
 
 .review-photo {
@@ -1949,7 +2109,7 @@ body {
 
 .faq {
   position: relative;
-  padding: 120px 5vw 130px;
+  padding: 90px 6vw 100px; /* mobile default */
   background: #fff;
   overflow: hidden;
 }
@@ -2006,8 +2166,8 @@ body {
 /* ---------- side CTA card ---------- */
 
 .faq-side {
-  position: sticky;
-  top: 116px;
+  position: static; /* mobile default */
+  margin-bottom: 32px;
   padding: 40px 34px;
   border-radius: 20px;
   background: linear-gradient(155deg, var(--navy) 0%, #232c5e 100%);
@@ -2048,10 +2208,10 @@ body {
 }
 
 .faq-question {
-  padding: 22px 24px;
+  padding: 18px 20px; /* mobile default */
   color: var(--navy);
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.95rem; /* mobile default */
   cursor: pointer;
   transition: color 0.25s ease;
 }
@@ -2098,7 +2258,7 @@ body {
 }
 .faq-answer p {
   margin: 0;
-  padding: 0 24px 24px;
+  padding: 0 20px 20px; /* mobile default */
   color: rgba(22, 25, 44, 0.75);
   line-height: 1.75;
   font-size: 0.96rem;
@@ -2113,7 +2273,7 @@ body {
 .contact-section {
   position: relative;
   overflow: hidden;
-  padding: 120px 5vw 130px;
+  padding: 90px 6vw 100px; /* mobile default */
   background:
     radial-gradient(
       700px 420px at 15% 100%,
@@ -2191,8 +2351,10 @@ body {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 22px;
-  padding: 44px;
+  padding: 28px 20px; /* mobile default */
   backdrop-filter: blur(6px);
+  transform: translateZ(0); /* stabilize compositing, see .site-header */
+  will-change: backdrop-filter;
 }
 
 .contact-form .form-label {
@@ -2282,7 +2444,7 @@ body {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 22px;
-  padding: 44px 40px;
+  padding: 34px 13px; /* mobile default */
 }
 
 .contact-status {
@@ -2326,7 +2488,7 @@ body {
 }
 
 .contact-info-list {
-  margin-bottom: 36px;
+  margin-bottom: 10px !important; /* mobile default */
 }
 .contact-info-list li {
   gap: 14px;
@@ -2339,7 +2501,7 @@ body {
 }
 .contact-info-list span {
   color: rgba(255, 255, 255, 0.65);
-  font-size: 0.92rem;
+  font-size: 12px !important; /* mobile default */
   line-height: 1.6;
 }
 .contact-info-list a {
@@ -2376,7 +2538,7 @@ body {
     #161f48 100%
   );
   color: rgba(255, 255, 255, 0.68);
-  padding: 100px 5vw 0;
+  padding: 90px 6vw 0; /* mobile default */
 }
 
 /* thin gradient light that sweeps across the very top edge on a loop */
@@ -2431,6 +2593,10 @@ body {
   --bs-gutter-x: 30px;
   --bs-gutter-y: 44px;
   padding-bottom: 64px;
+}
+
+.footer-brand {
+  margin-bottom: 8px; /* mobile default */
 }
 
 /* ---------- brand column ---------- */
@@ -2572,6 +2738,11 @@ body {
   padding: 26px 0;
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.52);
+  /* mobile default (note: HTML also carries Bootstrap's justify-content-between
+     !important utility, which wins over this non-!important override -- this
+     matches the pre-existing behavior we inherited, not a new issue) */
+  justify-content: center;
+  text-align: center;
 }
 .footer-copy {
   margin: 0;
@@ -2593,11 +2764,11 @@ body {
 
 .back-to-top {
   position: fixed;
-  right: 28px;
-  bottom: 28px;
+  right: 18px; /* mobile default */
+  bottom: 18px;
   z-index: 60;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: 50%;
   background: var(--accent);
